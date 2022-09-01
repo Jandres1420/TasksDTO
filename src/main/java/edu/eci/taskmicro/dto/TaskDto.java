@@ -1,14 +1,8 @@
 package edu.eci.taskmicro.dto;
-
+import edu.eci.taskmicro.entities.Status;
 public class TaskDto {
     private String name,description,assignedTo,dueDate,createdAt;
     private Status status;
-    public enum Status{
-        TODO,
-        DOING,
-        REVIEW,
-        DONE
-    }
     public TaskDto(String name,String description, String assignedTo, String dueDate, String createdAt, Status status ){
         this.name = name;
         this.description = description;

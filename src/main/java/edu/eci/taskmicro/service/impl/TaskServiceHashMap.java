@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 import edu.eci.taskmicro.dto.TaskDto;
 import edu.eci.taskmicro.entities.Status;
-
-
 import edu.eci.taskmicro.entities.Task;
 import edu.eci.taskmicro.service.TaskService;
 
@@ -62,8 +60,9 @@ public class TaskServiceHashMap implements TaskService {
     }
     @Override
     public Task fromDtoToEntity(TaskDto userDto) {
-         Task user = new Task(userDto.getId(), userDto.getName(), userDto.getEmail(), userDto.getLastName(),
-                userDto.getCreatedAt());
+         Task user = new Task(userDto.getName(), userDto.getDescription(), 
+                 userDto.getAssignedTo(), userDto.getDueDate(),
+                 userDto.getCreatedAt(), userDto.getStatus());
         return user;
     }
     

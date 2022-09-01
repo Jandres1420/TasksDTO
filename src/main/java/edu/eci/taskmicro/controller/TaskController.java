@@ -4,15 +4,20 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.eci.taskmicro.dto.TaskDto;
+import edu.eci.taskmicro.entities.Status;
+import edu.eci.taskmicro.entities.Task;
 import edu.eci.taskmicro.service.TaskService;
 
 @RestController
@@ -27,34 +32,49 @@ public class TaskController {
 
     @GetMapping
     public ResponseEntity<List<TaskDto>> getAll() {
-        return new ResponseEntity<List<UserDto>>(userService.fromEntityToDtos(allUsers), HttpStatus.ACCEPTED);
+        List<Task> allTasks = taskService.getAll();
+        return new ResponseEntity<List<TaskDto>>(taskService.fromEntityToDtos(allTasks),HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskDto> findById(@RequestParam(value = "name") String name) {
-        User user = userService.findById(id);
-        System.out.println("Que monda esta pasado");
-        System.out.println("usuario buscado " + user.getName() + " id " + user.getId());
-        return new ResponseEntity<UserDto>(userService.fromEntityToDto(user), HttpStatus.ACCEPTED);
+    @GetMapping("/findId")
+    public ResponseEntity<TaskDto> findById(@RequestParam(value = "id") String id) {
+        Task task = taskService.findById(id);
+        return new ResponseEntity<TaskDto>(taskService.fromEntityToDto(task), HttpStatus.ACCEPTED);
     }
 
     @PostMapping()
-    public ResponseEntity<TaskDto> create(@RequestParam(value="name") String name) {
-        User user = userService.fromDtoToEntity(userDto);
-        return new ResponseEntity<TaskDto>(userService.fromEntityToDto(userService.create(user)), HttpStatus.ACCEPTED);
+    public ResponseEntity<TaskDto> create(@RequestParam(value="name") String name,@RequestParam(value="description") String description,
+            @RequestParam(value = "assignedTo") String assignedTo, @RequestParam(value = "dueDate") String dueDate, @RequestParam(value = "createdAt") String createdAt,
+            @RequestParam(value = "status") String status) {
+        if(status.equals("TODO")){
+            Task task = new Task(name, description, assignedTo, dueDate, createdAt, Status.TODO);
+            return new ResponseEntity<TaskDto>(taskService.fromEntityToDto(taskService.create(task)),
+                    HttpStatus.ACCEPTED);
+        }else if (status.equals("DONE")){
+            Task task = new Task(name, description, assignedTo, dueDate, createdAt, Status.DONE);
+            return new ResponseEntity<TaskDto>(taskService.fromEntityToDto(taskService.create(task)),
+                    HttpStatus.ACCEPTED);
+        } else if (status.equals("REVIEW")) {
+            Task task = new Task(name, description, assignedTo, dueDate, createdAt, Status.REVIEW);
+            return new ResponseEntity<TaskDto>(taskService.fromEntityToDto(taskService.create(task)),
+                    HttpStatus.ACCEPTED);
+        } else{
+            Task task = new Task(name, description, assignedTo, dueDate, createdAt, Status.DOING);
+            return new ResponseEntity<TaskDto>(taskService.fromEntityToDto(taskService.create(task)),
+                    HttpStatus.ACCEPTED);
+        }    
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> update(@RequestBody UserDto user, @PathVariable String id) {
-        User userC = userService.fromDtoToEntity(user);
-        userService.fromEntityToDto(userService.update(userC, id));
-        return new ResponseEntity<UserDto>(userService.fromEntityToDto(userService.update(userC, id)),
+    public ResponseEntity<TaskDto> update(@RequestBody TaskDto user, @PathVariable String id) {
+        Task userC = taskService.fromDtoToEntity(user);
+        taskService.fromEntityToDto(taskService.update(userC, id));
+        return new ResponseEntity<TaskDto>(taskService.fromEntityToDto(taskService.update(userC, id)),
                 HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> delete(@PathVariable String id) {
-        // TODO implement this method using UserService
-        return null;
+    @DeleteMapping("/Delete}")
+    public boolean delete(@RequestParam(value = "id") String id) {
+        return taskService.deleteById(id);
     }
 }
