@@ -21,7 +21,8 @@ public class TaskServiceHashMap implements TaskService {
     }
     @Override
     public Task create(Task task) {
-        return tasks.put(Long.toString(counter.incrementAndGet()), task);
+        tasks.put(Long.toString(counter.incrementAndGet()), task);
+        return tasks.get(Long.toString(tasks.size()));
     }
 
     @Override
